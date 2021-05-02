@@ -12,4 +12,43 @@ package frc.robot;
  * <p>It is advised to statically import this class (or one of its inner classes) wherever the
  * constants are needed, to reduce verbosity.
  */
-public final class Constants {}
+public final class Constants {
+    public static int CANconfigTimeOut = 0;
+    public static final int minBatteryVoltage = 12;
+
+    public static final class DriveConstants{
+        public static final int kSwerveMotor1 = 10;
+        public static final int kSwerveSteer1 = 11;
+        public static final int kSwerveMotor2 = 20;
+        public static final int kSwerveSteer2 = 21;
+        public static final int kSwerveMotor3 = 30;
+        public static final int kSwerveSteer3 = 31;
+        public static final int kSwerveMotor4 = 40;
+        public static final int kSwerveSteer4 = 41;
+    }
+
+    public static final class IntakeConstants{
+        public static final int kIntakeMotor = 50;
+        public static final int kIntakeDown = 0;
+    }
+
+    public static final class IndexerConstants{
+        public static final int kIndexerMotor = 60;
+    }
+
+    public static final class TowerConstants{
+        public static final int kTowerMotorFront = 70;
+        public static final int kTowerMotorRear = 71;
+    }
+
+    public static final class LauncherConstants{
+        public static final int kLauncherMotorLeft = 80;
+        public static final int kFollowerMotorRight = 81;
+        public static final int kHoodServoLeft = 0;
+        public static final int kHoodServoRight = 1;
+    }
+
+    public static final class ClimberConstants{
+        public static final int kClimberMotor = 90;
+    }   
+}
