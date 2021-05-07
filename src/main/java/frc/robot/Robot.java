@@ -5,8 +5,10 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.lib.util.Debugger;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -18,6 +20,34 @@ public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
   private RobotContainer m_robotContainer;
+
+  // Add Debug flags
+  // You can have a flag for each subsystem, etc
+  public static final String _controls = "CONTROL";
+  public static final String _general = "GENERAL";
+  public static final String _auton = "AUTON";
+  public static final String _drive = "DRIVE";
+  public static final String _indexer = "INDEXER";
+  public static final String _intake = "INTAKE";
+  public static final String _launcher = "LAUNCHER";
+
+  public static final String _tower = "TOWER";
+  public static final String _climber = "CLIMBER";
+  public static final String _visionLL = "LIMELIGHT";
+
+  public enum RobotState {
+    DISABLED, AUTONOMOUS, TELEOP, TEST
+  }
+
+  public static RobotState s_robot_state = RobotState.DISABLED;
+
+  public static RobotState getState() {
+    return s_robot_state;
+  }
+
+  public static void setState(final RobotState state) {
+    s_robot_state = state;
+  }
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -48,7 +78,14 @@ public class Robot extends TimedRobot {
 
   /** This function is called once each time the robot enters Disabled mode. */
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {
+    printInfo("Start disabledInit()");
+    CommandScheduler.getInstance().cancelAll(); //Disable any currently running commands
+    LiveWindow.setEnabled(false);
+    LiveWindow.disableAllTelemetry();
+    setState(RobotState.DISABLED);
+    printInfo("End disabledInit()");
+  }
 
   @Override
   public void disabledPeriodic() {}
@@ -56,12 +93,20 @@ public class Robot extends TimedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
-    m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+    printInfo("Start autonomousInit()");
+    initDebugger(); //Config the Debugger based on FMS state
+    CommandScheduler.getInstance().cancelAll(); //Disable any currently running commands
+    LiveWindow.setEnabled(false);
+		LiveWindow.disableAllTelemetry();
+    setState(RobotState.AUTONOMOUS);
 
     // schedule the autonomous command (example)
+    m_autonomousCommand = m_robotContainer.getAutonomousCommand();
     if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();
     }
+
+    printInfo("End autonomousInit()");
   }
 
   /** This function is called periodically during autonomous. */
@@ -70,13 +115,18 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
-    // This makes sure that the autonomous stops running when
-    // teleop starts running. If you want the autonomous to
-    // continue until interrupted by another command, remove
-    // this line or comment it out.
+    printInfo("Start teleopInit()");
+    CommandScheduler.getInstance().cancelAll(); //Disable any currently running commands
+		LiveWindow.setEnabled(false);
+		LiveWindow.disableAllTelemetry();
+    setState(RobotState.TELEOP);
+
+    //Backup code to make sure the autonmous command is actually cancelled
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
+    initDebugger(); //Config the Debugger based on FMS state
+    printInfo("End teleopInit()");
   }
 
   /** This function is called periodically during operator control. */
@@ -92,4 +142,33 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during test mode. */
   @Override
   public void testPeriodic() {}
+
+  private static void initDebugger(){
+    if(RobotContainer.DS.isFMSAttached()) {
+      Debugger.setLevel(Debugger.warning4);
+    } else {
+      Debugger.setLevel(Debugger.info3);
+    }
+    Debugger.flagOn(_general); //Set all the flags on, comment out ones you want off
+    Debugger.flagOn(_auton);
+    Debugger.flagOn(_drive);
+    Debugger.flagOn(_indexer);
+    Debugger.flagOn(_intake);
+    Debugger.flagOn(_launcher);
+    Debugger.flagOn(_tower);
+    Debugger.flagOn(_climber);
+    Debugger.flagOn(_visionLL);
+  }
+
+  public static void printDebug(String msg) {
+    Debugger.println(msg, _general, Debugger.debug2);
+  }
+
+  public static void printInfo(String msg) {
+    Debugger.println(msg, _general, Debugger.info3);
+  }
+
+  public static void printWarning(String msg) {
+    Debugger.println(msg, _general, Debugger.warning4);
+  }
 }
