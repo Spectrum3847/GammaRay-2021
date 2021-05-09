@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.lib.controllers.SpectrumXboxController;
+import frc.robot.subsystems.Swerve;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -23,6 +24,7 @@ public class RobotContainer {
   
   // The robot's subsystems and commands are defined here...
 
+  public static Swerve swerve = new Swerve();
   public static DriverStation DS;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
