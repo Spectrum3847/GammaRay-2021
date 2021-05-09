@@ -1,0 +1,9 @@
+[
+  {
+    "artifact": "frcJava (in project GammaRay-2021)",
+    "target": "roborio",
+    "debugfile": "frcJava_roborio.debugconfig",
+    "project": "GammaRay-2021",
+    "language": "java"
+  }
+]
