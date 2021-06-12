@@ -151,27 +151,27 @@ public final class Constants {
     }
 
     public static final class IntakeConstants{
-        public static final int kIntakeMotor = 50;
-        public static final int kIntakeDown = 0;
+        public static final int kIntakeMotor = 40;
+        public static final int kIntakeDown = 6;
     }
 
     public static final class IndexerConstants{
-        public static final int kIndexerMotor = 60;
+        public static final int kIndexerMotor = 41;
     }
 
     public static final class TowerConstants{
-        public static final int kTowerMotorFront = 70;
-        public static final int kTowerMotorRear = 71;
+        public static final int kTowerMotorFront = 42;
+        public static final int kTowerMotorRear = 43;
     }
 
     public static final class LauncherConstants{
-        public static final int kLauncherMotorLeft = 80;
-        public static final int kFollowerMotorRight = 81;
+        public static final int kLauncherMotorLeft = 50;
+        public static final int kFollowerMotorRight = 51;
         public static final int kHoodServoLeft = 0;
         public static final int kHoodServoRight = 1;
     }
 
     public static final class ClimberConstants{
-        public static final int kClimberMotor = 90;
+        public static final int kClimberMotor = 60;
     }   
 }
