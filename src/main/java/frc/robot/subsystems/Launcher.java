@@ -12,6 +12,7 @@ import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 
+import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -25,6 +26,8 @@ public class Launcher extends SubsystemBase {
 
   public final TalonFX motorLeft;
   public final TalonFX motorRight;
+  public final Servo leftHood;
+  public final Servo rightHood;
 
   private double kP, kI, kD, kF;
   private int iZone;
@@ -43,7 +46,7 @@ public class Launcher extends SubsystemBase {
 
     
     motorLeft = new TalonFX(Constants.LauncherConstants.kLauncherMotorLeft);
-    motorLeft.setInverted(true);
+    motorLeft.setInverted(false);
     SupplyCurrentLimitConfiguration supplyCurrentLimit = new SupplyCurrentLimitConfiguration(true, 40, 45, 0.5);
     motorLeft.configSupplyCurrentLimit(supplyCurrentLimit);
 
@@ -56,14 +59,19 @@ public class Launcher extends SubsystemBase {
     motorLeft.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
 
     motorRight = new TalonFX(Constants.LauncherConstants.kFollowerMotorRight);
-    motorRight.setInverted(false);   //should be inverse of motorLeft
+    motorRight.setInverted(true);   //should be inverse of motorLeft
     motorRight.configSupplyCurrentLimit(supplyCurrentLimit);
     motorRight.follow(motorLeft);
 
     SpectrumPreferences.getInstance().getNumber("Launcher Setpoint", 1000);
 
-    //Set Dafault Command to be driven by the operator left stick and divide by 1.75 to reduce speed
-    this.setDefaultCommand(new RunCommand(() -> setPercentModeOutput(RobotContainer.operatorController.leftStick.getY() /1.75) , this));
+
+    leftHood = new Servo(Constants.LauncherConstants.kHoodServoLeft);
+    rightHood = new Servo(Constants.LauncherConstants.kHoodServoRight);
+    leftHood.setBounds(2.0, 1.8, 1.5, 1.2, 1.0);
+    rightHood.setBounds(2.0, 1.8, 1.5, 1.2, 1.0);
+
+    this.setDefaultCommand(new RunCommand(() -> stop() , this));
   }
 
   public void periodic() {
@@ -87,22 +95,20 @@ public class Launcher extends SubsystemBase {
   public double getWheelRPM() {
     return motorLeft.getSelectedSensorVelocity() * 8 / 30;
   }
-  public void feed(){
+  public void full(){
     setPercentModeOutput(1.0);
   }
 
-  public void fullDown(){
-    setPercentModeOutput(-1.0);
+  public void setHood(double value){
+    leftHood.set(value);
+    rightHood.set(value);
+  }
+  public void hoodFullFwd(){
+    setHood(1.0);
   }
 
-  public void indexUp(){
-    //setVelocity(500);
-    setPercentModeOutput(0.4);
-  }
-
-  public void indexDown(){
-    //setVelocity(500);
-    setPercentModeOutput(-0.4);
+  public void hoodFullRear(){
+    setHood(-1.0);
   }
 
   public void stop(){

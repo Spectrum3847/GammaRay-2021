@@ -40,7 +40,7 @@ public class Indexer extends SubsystemBase {
   }
 
   public void feed(){
-    setManualOutput(1.0);
+    setManualOutput(0.5);
   }
 
   public void stop(){

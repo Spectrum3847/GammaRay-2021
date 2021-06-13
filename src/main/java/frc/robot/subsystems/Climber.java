@@ -5,6 +5,8 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.FeedbackDevice;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 
@@ -24,9 +26,19 @@ public class Climber extends SubsystemBase {
   public Climber() {  
 
     motor = new TalonFX(Constants.ClimberConstants.kClimberMotor);
-    motor.setInverted(true);
+    motor.setInverted(false);
     SupplyCurrentLimitConfiguration supplyCurrentLimit = new SupplyCurrentLimitConfiguration(true, 40, 45, 0.5);
     motor.configSupplyCurrentLimit(supplyCurrentLimit);
+    motor.setNeutralMode(NeutralMode.Brake);
+    motor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
+
+    //climber assumes it starts fully down, then it will try to prevent driving into the hard stops
+    motor.setSelectedSensorPosition(0);
+    motor.configReverseSoftLimitThreshold(1000);
+    motor.configReverseSoftLimitEnable(true);
+
+    motor.configForwardSoftLimitThreshold(110000); //true hard limit is ~120900
+    motor.configForwardSoftLimitEnable(true);
 
     //Setup Default Command
     this.setDefaultCommand(new RunCommand(() -> setManualOutput(RobotContainer.operatorController.rightStick.getY()), this));

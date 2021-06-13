@@ -55,7 +55,10 @@ public class RobotContainer {
   private void configureButtonBindings() {
     operatorController.leftTriggerButton.whileHeld(new IntakeBalls());
     operatorController.selectButton.whileHeld(new RunCommand(() -> indexer.feed(), indexer));
-    operatorController.startButton.whileHeld(new RunCommand(()-> tower.setPercentModeOutput(1.0), tower));
+    operatorController.startButton.whileHeld(new RunCommand(()-> tower.setPercentModeOutput(0.5), tower));
+    operatorController.yButton.whileHeld(new RunCommand(() -> launcher.setPercentModeOutput(0.5), launcher));
+    operatorController.Dpad.Down.whenPressed(new RunCommand(() -> launcher.setHood(1.0), launcher));
+    operatorController.Dpad.Down.whenReleased(new RunCommand(() -> launcher.setHood(0), launcher));
   }
 
 

@@ -63,7 +63,7 @@ public class Tower extends SubsystemBase {
     SpectrumPreferences.getInstance().getNumber("Tower Setpoint", 1000);
 
     //Set Dafault Command to be driven by the operator left stick and divide by 1.75 to reduce speed
-    this.setDefaultCommand(new RunCommand(() -> setPercentModeOutput(RobotContainer.operatorController.leftStick.getY() /1.75) , this));
+    this.setDefaultCommand(new RunCommand(() -> stop() , this));
   }
 
   public void periodic() {

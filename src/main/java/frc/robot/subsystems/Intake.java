@@ -5,6 +5,7 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 
@@ -18,7 +19,7 @@ import frc.robot.Robot;
 
 public class Intake extends SubsystemBase {
 
-  public final double intakeSpeed = 1.0;
+  public final double intakeSpeed = 0.75;
 
   public final TalonFX motor;
   public final SpectrumSolenoid solDown;
@@ -28,9 +29,11 @@ public class Intake extends SubsystemBase {
   public Intake() {  
 
     motor = new TalonFX(Constants.IntakeConstants.kIntakeMotor);
-    motor.setInverted(true);
+    motor.setInverted(false);
     SupplyCurrentLimitConfiguration supplyCurrentLimit = new SupplyCurrentLimitConfiguration(true, 40, 45, 0.5);
     motor.configSupplyCurrentLimit(supplyCurrentLimit);
+    motor.setNeutralMode(NeutralMode.Brake);
+
 
     solDown = new SpectrumSolenoid(Constants.IntakeConstants.kIntakeDown);
 
