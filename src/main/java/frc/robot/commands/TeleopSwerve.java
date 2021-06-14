@@ -35,6 +35,7 @@ public class TeleopSwerve extends CommandBase {
         double xAxis = RobotContainer.driverController.leftStick.getX() * -1;
         double rAxis = RobotContainer.driverController.triggers.getTwist() * -1;
 
+        
         translation = new Translation2d(yAxis, xAxis).times(Constants.Swerve.maxSpeed);
         rotation = rAxis * Constants.Swerve.maxAngularVelocity;
         s_Swerve.drive(translation, rotation, fieldRelative, openLoop);

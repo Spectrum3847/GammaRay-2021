@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.sensors.PigeonIMU;
 
 import frc.robot.Constants;
+import frc.robot.RobotContainer;
 import frc.robot.commands.TeleopSwerve;
 import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics;
@@ -21,6 +22,8 @@ public class Swerve extends SubsystemBase {
     public SwerveDriveOdometry swerveOdometry;
     public SwerveModule[] mSwerveMods;
     public PigeonIMU gyro;
+    public double pidTurn = 0;
+    public boolean limelightAim = false;
 
     public Swerve() {
         gyro = new PigeonIMU(Constants.Swerve.pigeonID);
@@ -40,6 +43,11 @@ public class Swerve extends SubsystemBase {
     }
 
     public void drive(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
+        //If pidTurn is getting a value override the drivers steering control
+        if (pidTurn != 0) {
+            rotation = pidTurn;
+        }
+        
         SwerveModuleState[] swerveModuleStates =
             Constants.Swerve.swerveKinematics.toSwerveModuleStates(
                 fieldRelative ? ChassisSpeeds.fromFieldRelativeSpeeds(
@@ -58,7 +66,11 @@ public class Swerve extends SubsystemBase {
         for(SwerveModule mod : mSwerveMods){
             mod.setDesiredState(swerveModuleStates[mod.moduleNumber], isOpenLoop);
         }
-    }    
+    }
+
+    public void useOutput(double output) {
+            pidTurn = output;
+      }
 
     /* Used by SwerveControllerCommand in Auto */
     public void setModuleStates(SwerveModuleState[] desiredStates) {
@@ -89,21 +101,32 @@ public class Swerve extends SubsystemBase {
         gyro.setYaw(0);
     }
 
+    //Set gyro to a specific value
+    public void setGyro(double value){
+        gyro.setYaw(value);
+    }
+
     public Rotation2d getYaw() {
         double[] ypr = new double[3];
         gyro.getYawPitchRoll(ypr);
         return (Constants.Swerve.invertGyro) ? Rotation2d.fromDegrees(360 - ypr[0]) : Rotation2d.fromDegrees(ypr[0]);
     }
 
-    @Override
-    public void periodic(){
-        swerveOdometry.update(getYaw(), getStates());  
+    public double getDegrees() {
+        return getYaw().getDegrees();
+    }
 
+    public void dashboard(){
         for(SwerveModule mod : mSwerveMods){
             SmartDashboard.putNumber("Mod " + mod.moduleNumber + " Cancoder", mod.getCanCoder().getDegrees());
             SmartDashboard.putNumber("Mod " + mod.moduleNumber + " Integrated", mod.getState().angle.getDegrees());
             SmartDashboard.putNumber("Mod " + mod.moduleNumber + " Velocity", mod.getState().speedMetersPerSecond);    
         }
         SmartDashboard.putNumber("Gyro Yaw", getYaw().getDegrees());
+    }
+    
+    @Override
+    public void periodic(){
+        swerveOdometry.update(getYaw(), getStates());  
     }
 }

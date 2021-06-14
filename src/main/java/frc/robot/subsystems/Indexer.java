@@ -5,6 +5,7 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 
@@ -16,7 +17,10 @@ import frc.robot.Constants;
 import frc.robot.Robot;
 
 public class Indexer extends SubsystemBase {
-
+  public final double feedSpeed = 0.6;
+  public final double feedOnPulse = 0.3;
+  public final double feedOffPulse = 0.02;
+  public final double feedRevPulse = 0.04;
   public final TalonFX motor;
 
   /** Creates a new Indexer. */
@@ -26,6 +30,7 @@ public class Indexer extends SubsystemBase {
     motor.setInverted(true);
     SupplyCurrentLimitConfiguration supplyCurrentLimit = new SupplyCurrentLimitConfiguration(true, 40, 45, 0.5);
     motor.configSupplyCurrentLimit(supplyCurrentLimit);
+    motor.setNeutralMode(NeutralMode.Coast);
 
     this.setDefaultCommand(new RunCommand(() -> stop(), this));
   }
@@ -40,7 +45,10 @@ public class Indexer extends SubsystemBase {
   }
 
   public void feed(){
-    setManualOutput(0.5);
+    setManualOutput(feedSpeed);
+  }
+  public void feedRev(){
+    setManualOutput(-1 *feedSpeed);
   }
 
   public void stop(){

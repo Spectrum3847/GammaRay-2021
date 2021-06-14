@@ -9,6 +9,7 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 
@@ -38,17 +39,18 @@ public class Launcher extends SubsystemBase {
   public Launcher() {
     //Pid
 
-    kP = SpectrumPreferences.getInstance().getNumber("Launcher kP",0.05);
-    kI = SpectrumPreferences.getInstance().getNumber("Launcher kI",0.001);
-    kD = SpectrumPreferences.getInstance().getNumber("Launcher kD",0.07);
-    kF = SpectrumPreferences.getInstance().getNumber("Launcher kF",0.0472);
+    kP = SpectrumPreferences.getInstance().getNumber("Launcher kP", 0.0465);
+    kI = SpectrumPreferences.getInstance().getNumber("Launcher kI", 0.0005);
+    kD = SpectrumPreferences.getInstance().getNumber("Launcher kD", 0.0);
+    kF = SpectrumPreferences.getInstance().getNumber("Launcher kF", 0.048);
     iZone = (int) SpectrumPreferences.getInstance().getNumber("Launcher I-Zone", 150);
 
     
     motorLeft = new TalonFX(Constants.LauncherConstants.kLauncherMotorLeft);
-    motorLeft.setInverted(false);
+    motorLeft.setInverted(true);
     SupplyCurrentLimitConfiguration supplyCurrentLimit = new SupplyCurrentLimitConfiguration(true, 40, 45, 0.5);
     motorLeft.configSupplyCurrentLimit(supplyCurrentLimit);
+    motorLeft.setNeutralMode(NeutralMode.Coast);
 
     motorLeft.config_kP(0, kP);
     motorLeft.config_kI(0, kI);   
@@ -59,9 +61,10 @@ public class Launcher extends SubsystemBase {
     motorLeft.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
 
     motorRight = new TalonFX(Constants.LauncherConstants.kFollowerMotorRight);
-    motorRight.setInverted(true);   //should be inverse of motorLeft
+    motorRight.setInverted(false);   //should be inverse of motorLeft
     motorRight.configSupplyCurrentLimit(supplyCurrentLimit);
     motorRight.follow(motorLeft);
+    motorRight.setNeutralMode(NeutralMode.Coast);
 
     SpectrumPreferences.getInstance().getNumber("Launcher Setpoint", 1000);
 
@@ -87,13 +90,25 @@ public class Launcher extends SubsystemBase {
   }
 
   public void DashboardVelocity(){
+    //4096 sensor units per rev
+    //velocity is in sensor units per 100ms (0.1 secs)
+    //launcher belt is 42 to 24
+    //60000 milisecs in 1 min
+    //RPM to U/100ms is rotations*4096 / 60000ms
     double wheelRpm = SpectrumPreferences.getInstance().getNumber("Launcher Setpoint", 1000);
-    double motorVelocity = (wheelRpm * 30 / 8);
+    double motorVelocity = (wheelRpm / 600 * 2048) / 1.75;
     motorLeft.set(ControlMode.Velocity, motorVelocity);
   }
 
+  public void setLauncherVelocity(double wheelRPM){
+    //Sensor Velocity in ticks per 100ms / Sensor Ticks per Rev * 600 (ms to min) * 1.5 gear ratio to shooter
+    //Motor Velocity in RPM / 600 (ms to min) * Sensor ticks per rev / Gear Ratio 42to24
+    double motorVelocity = (wheelRPM / 600 * 2048) / 1.75;
+    setVelocity(motorVelocity);
+  }
+
   public double getWheelRPM() {
-    return motorLeft.getSelectedSensorVelocity() * 8 / 30;
+    return (motorLeft.getSelectedSensorVelocity() * 1.75) / 2048 * 600;
   }
   public void full(){
     setPercentModeOutput(1.0);
@@ -115,7 +130,7 @@ public class Launcher extends SubsystemBase {
     motorLeft.set(ControlMode.PercentOutput,0);
   }
 
-  public void Dashboard() {
+  public void dashboard() {
   SmartDashboard.putNumber("Launcher/Velocity", motorLeft.getSelectedSensorVelocity());
   SmartDashboard.putNumber("Launcher/WheelRPM", getWheelRPM());
   SmartDashboard.putNumber("Launcher/OutputPercentage", motorLeft.getMotorOutputPercent());

@@ -30,7 +30,6 @@ public class Robot extends TimedRobot {
   public static final String _indexer = "INDEXER";
   public static final String _intake = "INTAKE";
   public static final String _launcher = "LAUNCHER";
-
   public static final String _tower = "TOWER";
   public static final String _climber = "CLIMBER";
   public static final String _visionLL = "LIMELIGHT";

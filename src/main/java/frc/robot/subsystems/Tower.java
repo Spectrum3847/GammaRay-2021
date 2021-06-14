@@ -9,6 +9,7 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 
@@ -35,17 +36,18 @@ public class Tower extends SubsystemBase {
   public Tower() {
     //Pid
 
-    kP = SpectrumPreferences.getInstance().getNumber("Tower kP",0.05);
-    kI = SpectrumPreferences.getInstance().getNumber("Tower kI",0.001);
-    kD = SpectrumPreferences.getInstance().getNumber("Tower kD",0.07);
-    kF = SpectrumPreferences.getInstance().getNumber("Tower kF",0.0472);
+    kP = SpectrumPreferences.getInstance().getNumber("Tower kP",0.0465);
+    kI = SpectrumPreferences.getInstance().getNumber("Tower kI",0.0005);
+    kD = SpectrumPreferences.getInstance().getNumber("Tower kD",0.0);
+    kF = SpectrumPreferences.getInstance().getNumber("Tower kF",0.048);
     iZone = (int) SpectrumPreferences.getInstance().getNumber("Tower I-Zone", 150);
 
     
     motorFront = new TalonFX(Constants.TowerConstants.kTowerMotorFront);
     motorFront.setInverted(true);
-    SupplyCurrentLimitConfiguration supplyCurrentLimit = new SupplyCurrentLimitConfiguration(true, 40, 45, 0.5);
+    SupplyCurrentLimitConfiguration supplyCurrentLimit = new SupplyCurrentLimitConfiguration(true, 60, 65, 0.5);
     motorFront.configSupplyCurrentLimit(supplyCurrentLimit);
+    motorFront.setNeutralMode(NeutralMode.Coast);
 
     motorFront.config_kP(0, kP);
     motorFront.config_kI(0, kI);   
@@ -58,6 +60,7 @@ public class Tower extends SubsystemBase {
     motorRear = new TalonFX(Constants.TowerConstants.kTowerMotorRear);
     motorRear.setInverted(false);   //should be inverse of motorFront
     motorRear.configSupplyCurrentLimit(supplyCurrentLimit);
+    motorRear.setNeutralMode(NeutralMode.Coast);
     motorRear.follow(motorFront);
 
     SpectrumPreferences.getInstance().getNumber("Tower Setpoint", 1000);
@@ -84,36 +87,27 @@ public class Tower extends SubsystemBase {
     motorFront.set(ControlMode.Velocity, motorVelocity);
   }
 
+  public void setTowerVelocity(double wheelRPM){
+    //Sensor Velocity in ticks per 100ms / Sensor Ticks per Rev * 600 (ms to min) * 1.5 gear ratio to shooter
+    //Motor Velocity in RPM / 600 (ms to min) * Sensor ticks per rev / Gear Ratio 16 to 40
+    double motorVelocity = (wheelRPM / 600 * 2048) / 0.4;
+    setVelocity(motorVelocity);
+  }
+
   public double getWheelRPM() {
-    return motorFront.getSelectedSensorVelocity() * 8 / 30;
-  }
-  public void feed(){
-    setPercentModeOutput(1.0);
-  }
-
-  public void fullDown(){
-    setPercentModeOutput(-1.0);
-  }
-
-  public void indexUp(){
-    //setVelocity(500);
-    setPercentModeOutput(0.4);
-  }
-
-  public void indexDown(){
-    //setVelocity(500);
-    setPercentModeOutput(-0.4);
+    return (motorFront.getSelectedSensorVelocity() * 0.4) / 2048 * 600;
   }
 
   public void stop(){
     motorFront.set(ControlMode.PercentOutput,0);
   }
 
-  public void Dashboard() {
+  public void dashboard() {
   SmartDashboard.putNumber("Tower/Velocity", motorFront.getSelectedSensorVelocity());
   SmartDashboard.putNumber("Tower/WheelRPM", getWheelRPM());
   SmartDashboard.putNumber("Tower/OutputPercentage", motorFront.getMotorOutputPercent());
-  SmartDashboard.putNumber("Tower/LeftCurrent", motorFront.getSupplyCurrent());
+  SmartDashboard.putNumber("Tower/FrontCurrent", motorFront.getSupplyCurrent());
+  SmartDashboard.putNumber("Tower/RearCurrent", motorRear.getSupplyCurrent());
   }
 
   public static void printDebug(String msg){

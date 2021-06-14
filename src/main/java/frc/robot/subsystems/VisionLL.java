@@ -19,21 +19,26 @@ import frc.robot.Robot.RobotState;
 public class VisionLL extends SubsystemBase {
 
   public final LimeLight limelight;
-  private boolean LEDState;
+  private boolean LEDState = true;
+
+  private final double TargetHeight = 89.75;// in
+  private final double LLHeight = 34.25;// in
+  private final double LLAngle = 10; //deg
+  private double TargetAngle = 0;
+  private double Distance = 0;
 
   /**
    * Creates a new VisionLL.
    */
   public VisionLL() {
     limelight = new LimeLight();
-    setLimeLightLED(false);
+    limeLightLEDOn();
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
     //If disabled and LED-Toggle is false, than leave lights off, else they should be on
-    //if(!SmartDashboard.getBoolean("Limelight-LED Toggle", false) && !(RobotContainer.driverController.aButton.get() && (Robot.s_robot_state == RobotState.TELEOP))){
     if(Robot.s_robot_state == RobotState.DISABLED && !SmartDashboard.getBoolean("Limelight-LED Toggle", false) && !DriverStation.getInstance().isFMSAttached()){
       if (LEDState == true) {
         limeLightLEDOff();
@@ -45,23 +50,43 @@ public class VisionLL extends SubsystemBase {
         LEDState = true;
       }
     }
+
+    TargetAngle = limelight.getdegVerticalToTarget();
+    Distance = ((TargetHeight - LLHeight) / Math.tan(Math.toRadians(LLAngle + TargetAngle)));
+    SmartDashboard.putNumber("LL/LLDistance",Distance);
+    SmartDashboard.putNumber("LL/Distance", getActualDistance()); 
   }
 
-  private void limeLightLEDOff(){
+  public double getLLDistance(){
+    return Distance;
+  }
+  public double getActualDistance(){
+    return (Distance/12);
+  }
+  public double getRPM(){
+    if(Distance> 15.71){
+      return ((Distance/12) * 17.28) + 3200;
+    }
+
+    else{
+      return 3200;
+    }
+    
+  }
+
+  public void limeLightLEDOff(){
     limelight.setLEDMode(LedMode.kforceOff);
   }
 
-  private void limeLightLEDOn(){
+  public void limeLightLEDOn(){
     limelight.setLEDMode(LedMode.kforceOn);
   }
 
   public void setLimeLightLED(boolean b){
     if (b){
         limeLightLEDOn();
-        LEDState = true;
     } else{
         limeLightLEDOff();
-        LEDState = false;
     }
   }
 
@@ -75,6 +100,10 @@ public boolean getLLIsTargetFound(){
 
 public double getLLTargetArea(){
     return limelight.getTargetArea();
+}
+
+public boolean getLimelightHasValidTarget(){
+    return limelight.getIsTargetFound();
 }
 
 public void setLimeLightPipeline(int i) {

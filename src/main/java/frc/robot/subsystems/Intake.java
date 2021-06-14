@@ -32,8 +32,7 @@ public class Intake extends SubsystemBase {
     motor.setInverted(false);
     SupplyCurrentLimitConfiguration supplyCurrentLimit = new SupplyCurrentLimitConfiguration(true, 40, 45, 0.5);
     motor.configSupplyCurrentLimit(supplyCurrentLimit);
-    motor.setNeutralMode(NeutralMode.Brake);
-
+    motor.setNeutralMode(NeutralMode.Coast);
 
     solDown = new SpectrumSolenoid(Constants.IntakeConstants.kIntakeDown);
 
