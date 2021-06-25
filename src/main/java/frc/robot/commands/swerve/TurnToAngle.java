@@ -16,7 +16,7 @@ import frc.robot.commands.RumbleController;
 
 public class TurnToAngle extends ProfiledPIDCommand {
 
-  public static double kP = 0.011;
+  public static double kP = 0.005;
   public static double kI = 0; // 0.00015
   public static double kD = 0.00025; // 0.0005
 
@@ -39,6 +39,11 @@ public class TurnToAngle extends ProfiledPIDCommand {
     // Use addRequirements() here to declare subsystem dependencies.
     // Configure additional PID options by calling `getController` here.
     getController().setTolerance(0.2);
+    double differance = angle - RobotContainer.swerve.getDegrees();
+    if (differance > 180) {
+      differance = (360 - differance) * -1;
+    }
+    getController().setGoal(differance);
   }
 
   @Override

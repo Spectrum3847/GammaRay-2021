@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
@@ -18,6 +19,10 @@ import frc.lib.util.Debugger;
 import frc.lib.util.SpectrumPreferences;
 import frc.robot.commands.FeedBalls;
 import frc.robot.commands.IntakeBalls;
+import frc.robot.commands.ResetGyro;
+import frc.robot.commands.auto.ThreeBall;
+import frc.robot.commands.swerve.ClimberSwerve;
+import frc.robot.commands.swerve.LLAim;
 import frc.robot.commands.swerve.TurnToAngle;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Indexer;
@@ -47,11 +52,13 @@ public class RobotContainer {
   public static final Launcher launcher = new Launcher();
   public static final Climber climber = new Climber();
   public static final VisionLL visionLL = new VisionLL(); 
+  public static final Compressor compressor = new Compressor();
 
   public static DriverStation DS;
   public static PowerDistributionPanel pdp = new PowerDistributionPanel();
 
   public static SpectrumPreferences prefs = SpectrumPreferences.getInstance();
+public static Object shooter;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -60,6 +67,7 @@ public class RobotContainer {
     printInfo("Start robotInit()");
     Dashboard.intializeDashboard();
     configureButtonBindings();
+    compressor.start();
     printInfo("End robotInit()");
   }
 
@@ -72,16 +80,22 @@ public class RobotContainer {
   private void configureButtonBindings() {
     //Driver Controls
     //Reset Gyro based on left bumper and the abxy buttons
-    new SpectrumTwoButton(driverController.leftBumper, driverController.yButton).whenPressed(new RunCommand(()-> swerve.setGyro(0)));
-    new SpectrumTwoButton(driverController.leftBumper, driverController.xButton).whenPressed(new RunCommand(()-> swerve.setGyro(90)));
-    new SpectrumTwoButton(driverController.leftBumper, driverController.aButton).whenPressed(new RunCommand(()-> swerve.setGyro(180)));
-    new SpectrumTwoButton(driverController.leftBumper, driverController.bButton).whenPressed(new RunCommand(()-> swerve.setGyro(270)));
+    new SpectrumTwoButton(driverController.leftBumper, driverController.yButton).whileHeld(new ResetGyro(0));
+    new SpectrumTwoButton(driverController.leftBumper, driverController.xButton).whileHeld(new ResetGyro(90));
+    new SpectrumTwoButton(driverController.leftBumper, driverController.aButton).whileHeld(new ResetGyro(180));
+    new SpectrumTwoButton(driverController.leftBumper, driverController.bButton).whileHeld(new ResetGyro(270));
 
     //turn the robot to a cardinal direction
-    driverController.yButton.whenPressed(new TurnToAngle(0));
-    driverController.xButton.whenPressed(new TurnToAngle(90));
-    driverController.aButton.whenPressed(new TurnToAngle(180));
-    driverController.bButton.whenPressed(new TurnToAngle(270));
+    driverController.yButton.whileHeld(new TurnToAngle(0));
+    driverController.xButton.whileHeld(new TurnToAngle(90));
+    driverController.aButton.whileHeld(new TurnToAngle(180));
+    driverController.bButton.whileHeld(new TurnToAngle(270));
+
+    //Climber mode to disable field relative
+    driverController.startButton.whileHeld(new ClimberSwerve());
+
+    //Aim with limelight
+    driverController.rightBumper.whileHeld(new LLAim());
 
     //Intake
     operatorController.leftTriggerButton.whileHeld(new IntakeBalls());
@@ -93,22 +107,17 @@ public class RobotContainer {
     //Tower
     operatorController.startButton.whileHeld(new RunCommand(()-> tower.setPercentModeOutput(0.5), tower));
 
-    //Launcher and Tower Together, eventually these should be speed settings
-    operatorController.yButton.whileHeld(new RunCommand(() -> launcher.setPercentModeOutput(0.6), launcher).alongWith(
-      new RunCommand(()-> tower.setPercentModeOutput(0.3), tower)
-    ));
-
-    //Intiantion Line
+    //Don't use
     new SpectrumTwoButton(operatorController.rightTriggerButton, operatorController.aButton).whileHeld(
-      new RunCommand(()-> launcher.setLauncherVelocity(3700), launcher).alongWith(
+      new RunCommand(()-> launcher.setLauncherVelocity(3500), launcher).alongWith(
         new RunCommand(()-> tower.setTowerVelocity(1700))));
   
     //Trench
     new SpectrumTwoButton(operatorController.rightTriggerButton, operatorController.bButton).whileHeld(
-      new RunCommand(()-> launcher.setLauncherVelocity(4000), launcher).alongWith(
+      new RunCommand(()-> launcher.setLauncherVelocity(5000), launcher).alongWith(
         new RunCommand(()-> tower.setTowerVelocity(1700))));
 
-    //Behind Trench
+    //Intiantion line
     new SpectrumTwoButton(operatorController.rightTriggerButton, operatorController.xButton).whileHeld(
       new RunCommand(()-> launcher.setLauncherVelocity(4500), launcher).alongWith(
         new RunCommand(()-> tower.setTowerVelocity(1700))));
@@ -129,6 +138,7 @@ public class RobotContainer {
       )
     ));
 
+    operatorController.yButton.whileHeld(new RunCommand(()->climber.setManualOutput(-1), climber));
   }
 
   //foward limelight ports
@@ -144,7 +154,7 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // An ExampleCommand will run in autonomous
-    return null;
+    return new ThreeBall();
   }
 
   public static void printDebug(String msg){

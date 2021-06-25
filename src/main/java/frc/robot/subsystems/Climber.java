@@ -4,9 +4,14 @@
 
 package frc.robot.subsystems;
 
+import java.io.ObjectInputFilter.Status;
+
+import com.ctre.phoenix.motorcontrol.ControlFrame;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
+import com.ctre.phoenix.motorcontrol.StatusFrame;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 
@@ -27,18 +32,28 @@ public class Climber extends SubsystemBase {
 
     motor = new TalonFX(Constants.ClimberConstants.kClimberMotor);
     motor.setInverted(false);
-    SupplyCurrentLimitConfiguration supplyCurrentLimit = new SupplyCurrentLimitConfiguration(true, 40, 45, 0.5);
+    SupplyCurrentLimitConfiguration supplyCurrentLimit = new SupplyCurrentLimitConfiguration(false, 160, 1600, 10);
     motor.configSupplyCurrentLimit(supplyCurrentLimit);
+    motor.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(false, 170, 170, 10));
     motor.setNeutralMode(NeutralMode.Brake);
     motor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
 
     //climber assumes it starts fully down, then it will try to prevent driving into the hard stops
     motor.setSelectedSensorPosition(0);
     motor.configReverseSoftLimitThreshold(1000);
-    motor.configReverseSoftLimitEnable(true);
+    motor.configReverseSoftLimitEnable(false);
 
-    motor.configForwardSoftLimitThreshold(110000); //true hard limit is ~120900
-    motor.configForwardSoftLimitEnable(true);
+    motor.configForwardSoftLimitThreshold(120000); //true hard limit is ~120900
+    motor.configForwardSoftLimitEnable(false);
+
+    int time = 255;
+    /*motor.setStatusFramePeriod(StatusFrame.Status_6_Misc, time);
+    motor.setStatusFramePeriod(StatusFrame.Status_7_CommStatus, time);
+    motor.setStatusFramePeriod(StatusFrame.Status_9_MotProfBuffer, time);
+    motor.setStatusFramePeriod(StatusFrame.Status_10_MotionMagic, time);
+    motor.setStatusFramePeriod(StatusFrame.Status_13_Base_PIDF0, time);
+    motor.setStatusFramePeriod(StatusFrame.Status_14_Turn_PIDF1, time);
+    motor.setStatusFramePeriod(StatusFrame.Status_17_Targets1, time);*/
 
     //Setup Default Command
     this.setDefaultCommand(new RunCommand(() -> setManualOutput(RobotContainer.operatorController.rightStick.getY()), this));

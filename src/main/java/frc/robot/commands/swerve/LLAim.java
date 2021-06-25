@@ -16,7 +16,7 @@ import frc.robot.commands.RumbleController;
 
 public class LLAim extends ProfiledPIDCommand {
 
-  public static double kP = 0.011;
+  public static double kP = 0.03;
   public static double kI = 0; // 0.00015
   public static double kD = 0.00025; // 0.0005
 

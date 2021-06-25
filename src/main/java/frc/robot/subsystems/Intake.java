@@ -4,8 +4,10 @@
 
 package frc.robot.subsystems;
 
+import com.ctre.phoenix.motorcontrol.ControlFrame;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.StatusFrame;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 
@@ -34,6 +36,18 @@ public class Intake extends SubsystemBase {
     motor.configSupplyCurrentLimit(supplyCurrentLimit);
     motor.setNeutralMode(NeutralMode.Coast);
 
+    int time = 255;
+    //motor.setStatusFramePeriod(StatusFrame.Status_1_General, 100);
+    motor.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, time);
+    motor.setStatusFramePeriod(StatusFrame.Status_6_Misc, time);
+    motor.setStatusFramePeriod(StatusFrame.Status_7_CommStatus, time);
+    motor.setStatusFramePeriod(StatusFrame.Status_9_MotProfBuffer, time);
+    motor.setStatusFramePeriod(StatusFrame.Status_10_MotionMagic, time);
+    motor.setStatusFramePeriod(StatusFrame.Status_12_Feedback1, time);
+    motor.setStatusFramePeriod(StatusFrame.Status_13_Base_PIDF0, time);
+    motor.setStatusFramePeriod(StatusFrame.Status_14_Turn_PIDF1, time);
+    motor.setStatusFramePeriod(StatusFrame.Status_17_Targets1, time);
+    
     solDown = new SpectrumSolenoid(Constants.IntakeConstants.kIntakeDown);
 
     this.setDefaultCommand(new RunCommand(() -> stop(), this));

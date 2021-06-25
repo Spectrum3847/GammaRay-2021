@@ -24,6 +24,9 @@ public class Swerve extends SubsystemBase {
     public PigeonIMU gyro;
     public double pidTurn = 0;
     public boolean limelightAim = false;
+    public double drive_x = 0;
+    public double drive_y = 0;
+    public double drive_rotation = 0;
 
     public Swerve() {
         gyro = new PigeonIMU(Constants.Swerve.pigeonID);
@@ -66,10 +69,13 @@ public class Swerve extends SubsystemBase {
         for(SwerveModule mod : mSwerveMods){
             mod.setDesiredState(swerveModuleStates[mod.moduleNumber], isOpenLoop);
         }
+        drive_y = translation.getY();
+        drive_x = translation.getX();
+        drive_rotation = rotation;
     }
 
     public void useOutput(double output) {
-            pidTurn = output;
+            pidTurn = output * Constants.Swerve.maxAngularVelocity;
       }
 
     /* Used by SwerveControllerCommand in Auto */
@@ -123,6 +129,10 @@ public class Swerve extends SubsystemBase {
             SmartDashboard.putNumber("Mod " + mod.moduleNumber + " Velocity", mod.getState().speedMetersPerSecond);    
         }
         SmartDashboard.putNumber("Gyro Yaw", getYaw().getDegrees());
+        SmartDashboard.putNumber("Drive Y", drive_y);
+        SmartDashboard.putNumber("Drive X", drive_x);
+        SmartDashboard.putNumber("Drive Rotation", drive_rotation);
+
     }
     
     @Override

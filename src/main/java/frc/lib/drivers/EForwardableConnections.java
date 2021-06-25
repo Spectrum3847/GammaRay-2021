@@ -8,13 +8,13 @@ import edu.wpi.first.wpiutil.net.PortForwarder;
     /**
      * The visual feed, used to display what the camera sees
      */
-    LIMELIGHT_CAMERA_FEED("10.38.47.11", 5800),
+    LIMELIGHT_CAMERA_FEED("10.85.15.22", 5800),
     /**
      *
      * The web URL view. Note that the {@link EForwardableConnections#LIMELIGHT_CAMERA_FEED} must be forwarded as well for
      * the camera to show up in this view.
      */
-    LIMELIGHT_WEB_VIEW("10.38.47.11", 5801);
+    LIMELIGHT_WEB_VIEW("10.85.15.22", 5801);
     private EForwardableConnections(String pIPAddress, int pPort) {
         mpIPAddress = pIPAddress;
         mPort = pPort;

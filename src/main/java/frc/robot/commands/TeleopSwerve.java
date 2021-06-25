@@ -33,7 +33,7 @@ public class TeleopSwerve extends CommandBase {
     public void execute() {
         double yAxis = RobotContainer.driverController.leftStick.getY();
         double xAxis = RobotContainer.driverController.leftStick.getX() * -1;
-        double rAxis = RobotContainer.driverController.triggers.getTwist() * -1;
+        double rAxis = RobotContainer.driverController.triggers.getTwist() * -0.75;
 
         
         translation = new Translation2d(yAxis, xAxis).times(Constants.Swerve.maxSpeed);

@@ -10,6 +10,7 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.StatusFrame;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 
@@ -29,6 +30,8 @@ public class Tower extends SubsystemBase {
 
   private double kP, kI, kD, kF;
   private int iZone;
+
+  public final double towerRPM = 1700;
 
   /**
    * Creates a new Intake.
@@ -54,6 +57,7 @@ public class Tower extends SubsystemBase {
     motorFront.config_kD(0, kD);  
     motorFront.config_kF(0, kF);  
     motorFront.config_IntegralZone(0, iZone);
+   // motorFront.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 10);
 
     motorFront.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
 
@@ -62,6 +66,16 @@ public class Tower extends SubsystemBase {
     motorRear.configSupplyCurrentLimit(supplyCurrentLimit);
     motorRear.setNeutralMode(NeutralMode.Coast);
     motorRear.follow(motorFront);
+
+    int time = 255;
+    //motorRear.setStatusFramePeriod(StatusFrame.Status_1_General, 10);
+    motorRear.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, time);
+    motorRear.setStatusFramePeriod(StatusFrame.Status_6_Misc, time);
+    motorRear.setStatusFramePeriod(StatusFrame.Status_7_CommStatus, time);
+    motorRear.setStatusFramePeriod(StatusFrame.Status_9_MotProfBuffer, time);
+    motorRear.setStatusFramePeriod(StatusFrame.Status_10_MotionMagic, time);
+    motorRear.setStatusFramePeriod(StatusFrame.Status_12_Feedback1, time);
+    motorRear.setStatusFramePeriod(StatusFrame.Status_14_Turn_PIDF1, time);
 
     SpectrumPreferences.getInstance().getNumber("Tower Setpoint", 1000);
 

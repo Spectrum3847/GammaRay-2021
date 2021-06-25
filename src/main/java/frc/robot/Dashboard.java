@@ -37,6 +37,8 @@ public class Dashboard {
         RobotContainer.intake.dashboard();
         RobotContainer.indexer.dashboard();
         RobotContainer.climber.dashboard();
+        SmartDashboard.putBoolean("Pressure SW",
+                RobotContainer.compressor.getPressureSwitchValue());
     }
 
     //Things that don't need to be sent out each cycle
