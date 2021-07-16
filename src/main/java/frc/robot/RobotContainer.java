@@ -40,7 +40,7 @@ import frc.robot.subsystems.VisionLL;
  */
 public class RobotContainer {
     //Create Joysticks first so they can be used in defaultCommands
-    public static SpectrumXboxController driverController = new SpectrumXboxController(0, .1, .1);
+    public static SpectrumXboxController driverController = new SpectrumXboxController(0, .15, .15);
     public static SpectrumXboxController operatorController = new SpectrumXboxController(1, .06, .05);
   
   // The robot's subsystems and commands are defined here...

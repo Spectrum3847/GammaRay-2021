@@ -39,7 +39,7 @@ public final class Constants {
         public static final double openLoopRamp = 0.25;
         public static final double closedLoopRamp = 0.0;
 
-        public static final double driveGearRatio = (8.16 / 1.0); //6.86:1
+        public static final double driveGearRatio = (8.16 / 1.0); //8.16:1
         public static final double angleGearRatio = (12.8 / 1.0); //12.8:1
 
         public static final SwerveDriveKinematics swerveKinematics = new SwerveDriveKinematics(
@@ -72,9 +72,9 @@ public final class Constants {
         public static final double driveKF = 0.0;
 
         /* Drive Motor Characterization Values */
-        public static final double driveKS = (0.667 / 12); //divide by 12 to convert from volts to percent output for CTRE
-        public static final double driveKV = (2.44 / 12);
-        public static final double driveKA = (0.27 / 12);
+        public static final double driveKS = (0.605 / 12); // (0.667 / 12); //divide by 12 to convert from volts to percent output for CTRE
+        public static final double driveKV = (1.72 / 12); //(2.44 / 12);
+        public static final double driveKA = (0.193/12); //(0.27 / 12);
 
         /* Swerve Profiling Values */
         public static final double maxSpeed = 4.5; //meters per second
@@ -117,7 +117,7 @@ public final class Constants {
             public static final int driveMotorID = 21;
             public static final int angleMotorID = 22;
             public static final int canCoderID = 23;
-            public static final double angleOffset = 258.48; //practice robot 275.1;
+            public static final double angleOffset = 257.6; //practice robot 275.1;
             public static final SwerveModuleConstants constants = 
                 new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
         }

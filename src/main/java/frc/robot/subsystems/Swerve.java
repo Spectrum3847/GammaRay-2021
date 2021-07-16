@@ -5,7 +5,9 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.sensors.PigeonIMU;
 
+import frc.lib.util.Debugger;
 import frc.robot.Constants;
+import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.commands.TeleopSwerve;
 import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
@@ -51,6 +53,9 @@ public class Swerve extends SubsystemBase {
             rotation = pidTurn;
         }
         
+        if (Math.abs(rotation) < 0.03){
+            rotation = 0;
+        }
         SwerveModuleState[] swerveModuleStates =
             Constants.Swerve.swerveKinematics.toSwerveModuleStates(
                 fieldRelative ? ChassisSpeeds.fromFieldRelativeSpeeds(
@@ -76,6 +81,8 @@ public class Swerve extends SubsystemBase {
 
     public void useOutput(double output) {
             pidTurn = output * Constants.Swerve.maxAngularVelocity;
+            printDebug("LL Output: " + output);
+            printDebug("LL pidTurn: " + pidTurn);
       }
 
     /* Used by SwerveControllerCommand in Auto */
@@ -124,14 +131,14 @@ public class Swerve extends SubsystemBase {
 
     public void dashboard(){
         for(SwerveModule mod : mSwerveMods){
-            SmartDashboard.putNumber("Mod " + mod.moduleNumber + " Cancoder", mod.getCanCoder().getDegrees());
-            SmartDashboard.putNumber("Mod " + mod.moduleNumber + " Integrated", mod.getState().angle.getDegrees());
-            SmartDashboard.putNumber("Mod " + mod.moduleNumber + " Velocity", mod.getState().speedMetersPerSecond);    
+            SmartDashboard.putNumber("Swerve/Mod " + mod.moduleNumber + " Cancoder", mod.getCanCoder().getDegrees());
+            SmartDashboard.putNumber("Swerve/Mod " + mod.moduleNumber + " Integrated", mod.getState().angle.getDegrees());
+            SmartDashboard.putNumber("Swerve/Mod " + mod.moduleNumber + " Velocity", mod.getState().speedMetersPerSecond);    
         }
-        SmartDashboard.putNumber("Gyro Yaw", getYaw().getDegrees());
-        SmartDashboard.putNumber("Drive Y", drive_y);
-        SmartDashboard.putNumber("Drive X", drive_x);
-        SmartDashboard.putNumber("Drive Rotation", drive_rotation);
+        SmartDashboard.putNumber("Swerve/Gyro Yaw", getYaw().getDegrees());
+        SmartDashboard.putNumber("Swerve/Drive Y", drive_y);
+        SmartDashboard.putNumber("Swerve/Drive X", drive_x);
+        SmartDashboard.putNumber("Swerve/Drive Rotation", drive_rotation);
 
     }
     
@@ -139,4 +146,16 @@ public class Swerve extends SubsystemBase {
     public void periodic(){
         swerveOdometry.update(getYaw(), getStates());  
     }
+
+    public static void printDebug(String msg){
+        Debugger.println(msg, Robot._drive, Debugger.debug2);
+      }
+      
+      public static void printInfo(String msg){
+        Debugger.println(msg, Robot._drive, Debugger.info3);
+      }
+      
+      public static void printWarning(String msg) {
+        Debugger.println(msg, Robot._drive, Debugger.warning4);
+      }
 }
