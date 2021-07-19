@@ -9,10 +9,8 @@ package frc.robot.commands.swerve;
 
 import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ProfiledPIDCommand;
 import frc.robot.RobotContainer;
-import frc.robot.commands.RumbleController;
 
 public class TurnToAngle extends ProfiledPIDCommand {
 
