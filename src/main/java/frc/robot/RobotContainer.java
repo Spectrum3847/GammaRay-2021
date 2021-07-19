@@ -19,7 +19,7 @@ import frc.lib.util.Debugger;
 import frc.lib.util.SpectrumPreferences;
 import frc.robot.commands.FeedBalls;
 import frc.robot.commands.IntakeBalls;
-import frc.robot.commands.ResetGyro;
+import frc.robot.commands.swerve.ResetGyro;
 import frc.robot.commands.auto.ThreeBall;
 import frc.robot.commands.swerve.ClimberSwerve;
 import frc.robot.commands.swerve.LLAim;

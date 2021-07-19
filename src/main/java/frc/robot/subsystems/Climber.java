@@ -42,7 +42,7 @@ public class Climber extends SubsystemBase {
     motor.configForwardSoftLimitThreshold(120000); //true hard limit is ~120900
     motor.configForwardSoftLimitEnable(false);
 
-    int time = 255;
+    //int time = 255;
     /*motor.setStatusFramePeriod(StatusFrame.Status_6_Misc, time);
     motor.setStatusFramePeriod(StatusFrame.Status_7_CommStatus, time);
     motor.setStatusFramePeriod(StatusFrame.Status_9_MotProfBuffer, time);
