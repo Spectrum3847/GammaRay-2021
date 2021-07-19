@@ -22,7 +22,6 @@ import frc.lib.util.Debugger;
 import frc.lib.util.SpectrumPreferences;
 import frc.robot.Constants;
 import frc.robot.Robot;
-import frc.robot.RobotContainer;
 
 public class Launcher extends SubsystemBase {
 

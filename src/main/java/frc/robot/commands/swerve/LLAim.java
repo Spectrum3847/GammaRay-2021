@@ -7,42 +7,47 @@
 
 package frc.robot.commands.swerve;
 
-import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
-import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.ProfiledPIDCommand;
+import edu.wpi.first.wpilibj.controller.PIDController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.PIDCommand;
+import frc.lib.util.Debugger;
+import frc.lib.util.SpectrumPreferences;
+import frc.robot.Robot;
 import frc.robot.RobotContainer;
-import frc.robot.commands.RumbleController;
 
-public class LLAim extends ProfiledPIDCommand {
+public class LLAim extends PIDCommand {
 
-  public static double kP = 0.03;
-  public static double kI = 0; // 0.00015
-  public static double kD = 0.00025; // 0.0005
+  public static double kP = 0;
+  public static double kI = 0;
+  public static double kD = 0;
 
   boolean hasTarget = false;
   
-  public LLAim() {
+  public LLAim() {    
     super(
-        // The ProfiledPIDController used by the command
-        new ProfiledPIDController(
+        // The PPIDController used by the command
+        new PIDController(
             // The PID gainss
-            kP, kI, kD,
-            // The motion profile constraints
-            new TrapezoidProfile.Constraints(360, 360)),
+            kP, kI, kD),
         // This should return the measurement
         RobotContainer.visionLL::getLLDegToTarget,
         // This should return the goal (can also be a constant)
         0,
         // This uses the output
-        (output, setpoint) -> RobotContainer.swerve.useOutput(output));
+        (output) -> RobotContainer.swerve.useOutput(output * -1)); // -1 to turn correct direction
     // Use addRequirements() here to declare subsystem dependencies.
     // Configure additional PID options by calling `getController` here.
-    getController().setTolerance(0.2);
   }
 
   @Override
   public void initialize() {
+    kP = SpectrumPreferences.getInstance().getNumber("LL-AIM kP", 0.01)/100;
+    kI = SpectrumPreferences.getInstance().getNumber("LL-AIM kI", 0.0)/100;
+    kD = SpectrumPreferences.getInstance().getNumber("LL-AIM kD", 0.0)/100;
+    double tolerance = SpectrumPreferences.getInstance().getNumber("LL-AIM Tolerance", 1.0);
+    this.getController().setPID(kP, kI, kD);
+    getController().setTolerance(tolerance);
+
     if(RobotContainer.visionLL.getLimelightHasValidTarget()) {
       hasTarget = true;
     } else {
@@ -61,23 +66,44 @@ public class LLAim extends ProfiledPIDCommand {
   @Override
   public void execute() {
     super.execute();
+    printDebug("Angle: " + this.m_measurement.getAsDouble());
+    Debugger.setLevel(Debugger.debug2);
+    dashboard();
   }
 
+  public void dashboard() {
+    SmartDashboard.putNumber("LL-AIM/ERROR", this.getController().getPositionError());
+  }
+
+  
   @Override
   public void end(boolean interrupted) {
     super.end(interrupted);
-    if (hasTarget) {
+    //currently vibrates as long as it has target, doesn't care how far from target we are
+    /*if (hasTarget) {
       new ParallelCommandGroup(
         new RumbleController(RobotContainer.operatorController, 0.5),
         new RumbleController(RobotContainer.driverController, 0.5)
       ).schedule();
-    }
+    }*/
     RobotContainer.swerve.useOutput(0);
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false; //getController().atGoal() || !hasTarget;
+    return getController().atSetpoint(); //getController().atGoal() || !hasTarget;
+  }
+
+  public static void printDebug(String msg){
+    Debugger.println(msg, Robot._visionLL, Debugger.debug2);
+  }
+  
+  public static void printInfo(String msg){
+    Debugger.println(msg, Robot._visionLL, Debugger.info3);
+  }
+  
+  public static void printWarning(String msg) {
+    Debugger.println(msg, Robot._visionLL, Debugger.warning4);
   }
 }
