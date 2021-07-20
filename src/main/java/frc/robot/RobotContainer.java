@@ -20,6 +20,7 @@ import frc.lib.util.SpectrumPreferences;
 import frc.robot.commands.FeedBalls;
 import frc.robot.commands.IntakeBalls;
 import frc.robot.commands.swerve.ResetGyro;
+import frc.robot.commands.auto.TestPathFollowing;
 import frc.robot.commands.auto.ThreeBall;
 import frc.robot.commands.swerve.ClimberSwerve;
 import frc.robot.commands.swerve.LLAim;
@@ -87,9 +88,9 @@ public static Object shooter;
 
     //turn the robot to a cardinal direction
     driverController.yButton.whileHeld(new TurnToAngle(0));
-    driverController.xButton.whileHeld(new TurnToAngle(90));
-    driverController.aButton.whileHeld(new TurnToAngle(180));
-    driverController.bButton.whileHeld(new TurnToAngle(270));
+    driverController.xButton.whileHeld(new TurnToAngle(Math.PI/2));
+    driverController.aButton.whileHeld(new TurnToAngle(-Math.PI));
+    driverController.bButton.whileHeld(new TurnToAngle(-Math.PI/2));
 
     //Climber mode to disable field relative
     driverController.startButton.whileHeld(new ClimberSwerve());
@@ -154,7 +155,7 @@ public static Object shooter;
    */
   public Command getAutonomousCommand() {
     // An ExampleCommand will run in autonomous
-    return new ThreeBall();
+    return new TestPathFollowing();
   }
 
   public static void printDebug(String msg){

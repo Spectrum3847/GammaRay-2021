@@ -167,10 +167,13 @@ public class Swerve extends SubsystemBase {
             SmartDashboard.putNumber("Swerve/Mod " + mod.moduleNumber + " Integrated", mod.getState().angle.getDegrees());
             SmartDashboard.putNumber("Swerve/Mod " + mod.moduleNumber + " Velocity", mod.getState().speedMetersPerSecond);    
         }
-        SmartDashboard.putNumber("Swerve/Gyro Yaw", getYaw().getDegrees());
-        SmartDashboard.putNumber("Swerve/Drive Y", drive_y);
-        SmartDashboard.putNumber("Swerve/Drive X", drive_x);
-        SmartDashboard.putNumber("Swerve/Drive Rotation", drive_rotation);
+        SmartDashboard.putNumber("Swerve/Gyro Yaw", getYaw().getRadians());
+        SmartDashboard.putNumber("Swerve/Drive vY", drive_y);
+        SmartDashboard.putNumber("Swerve/Drive vX", drive_x);
+        SmartDashboard.putNumber("Swerve/Drive vRotation", drive_rotation);
+
+        SmartDashboard.putNumber("Swerve/Drive pY", this.getPose().getY());
+        SmartDashboard.putNumber("Swerve/Drive pX", this.getPose().getX());
 
     }
     
