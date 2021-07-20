@@ -12,6 +12,7 @@ import frc.robot.commands.swerve.TeleopSwerve;
 import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.wpilibj.kinematics.SwerveDriveOdometry;
+import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
@@ -24,10 +25,10 @@ public class Swerve extends SubsystemBase {
     public SwerveModule[] mSwerveMods;
     public PigeonIMU gyro;
     public double pidTurn = 0;
-    public boolean limelightAim = false;
     public double drive_x = 0;
     public double drive_y = 0;
     public double drive_rotation = 0;
+    public ProfiledPIDController thetaController = null;
 
     public Swerve() {
         gyro = new PigeonIMU(Constants.Swerve.pigeonID);
@@ -43,6 +44,11 @@ public class Swerve extends SubsystemBase {
             new SwerveModule(3, Constants.Swerve.Mod3.constants)
         };
 
+        //Setup thetaController used for auton and automatic turns
+        thetaController = new ProfiledPIDController(Constants.AutoConstants.kPThetaController, 0, 0,
+                            Constants.AutoConstants.kThetaControllerConstraints);
+        thetaController.enableContinuousInput(-Math.PI, Math.PI);
+
         setDefaultCommand(new TeleopSwerve(this, true, false));
     }
 
@@ -51,10 +57,11 @@ public class Swerve extends SubsystemBase {
         if (pidTurn != 0) {
             rotation = pidTurn;
         }
-        
+        //Deadzone on rotation
         if (Math.abs(rotation) < 0.03){
             rotation = 0;
         }
+
         SwerveModuleState[] swerveModuleStates =
             Constants.Swerve.swerveKinematics.toSwerveModuleStates(
                 fieldRelative ? ChassisSpeeds.fromFieldRelativeSpeeds(
@@ -79,10 +86,12 @@ public class Swerve extends SubsystemBase {
     }
 
     public void useOutput(double output) {
-            pidTurn = output * Constants.Swerve.maxAngularVelocity;
-            printDebug("LL Output: " + output);
-            printDebug("LL pidTurn: " + pidTurn);
-      }
+        pidTurn = output * Constants.Swerve.maxAngularVelocity;
+    }
+
+    public void setRotationalVelocity(double rotationalVelocity){
+        pidTurn = rotationalVelocity;
+    }
 
     /* Used by SwerveControllerCommand in Auto */
     public void setModuleStates(SwerveModuleState[] desiredStates) {
@@ -126,6 +135,10 @@ public class Swerve extends SubsystemBase {
 
     public double getDegrees() {
         return getYaw().getDegrees();
+    }
+
+    public double getRadians() {
+        return getYaw().getRadians();
     }
 
     public void dashboard(){
