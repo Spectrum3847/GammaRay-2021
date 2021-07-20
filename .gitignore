@@ -34,3 +34,9 @@ hs_err_pid*
 *.class
 *.lock
 *.bin
+.gradle/6.0.1/executionHistory/executionHistory.bin
+.gradle/6.0.1/executionHistory/executionHistory.bin
+.gradle/6.0.1/executionHistory/executionHistory.lock
+*.bin
+build/classes/java/main/frc/robot/subsystems/Swerve.class
+build/libs/GammaRay-2021.jar

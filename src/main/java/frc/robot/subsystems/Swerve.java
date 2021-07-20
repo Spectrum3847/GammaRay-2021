@@ -6,12 +6,14 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.sensors.PigeonIMU;
 
 import frc.lib.util.Debugger;
+import frc.lib.util.SpectrumPreferences;
 import frc.robot.Constants;
 import frc.robot.Robot;
 import frc.robot.commands.swerve.TeleopSwerve;
 import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.wpilibj.kinematics.SwerveDriveOdometry;
+import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
@@ -28,7 +30,10 @@ public class Swerve extends SubsystemBase {
     public double drive_x = 0;
     public double drive_y = 0;
     public double drive_rotation = 0;
-    public ProfiledPIDController thetaController = null;
+    public ProfiledPIDController thetaController = new ProfiledPIDController(Constants.AutoConstants.kPThetaController, 0, 0,
+                                                            Constants.AutoConstants.kThetaControllerConstraints);;
+    public PIDController xController = new PIDController(Constants.AutoConstants.kPXController, 0, 0);
+    public PIDController yController = new PIDController(Constants.AutoConstants.kPYController, 0, 0);
 
     public Swerve() {
         gyro = new PigeonIMU(Constants.Swerve.pigeonID);
@@ -45,11 +50,24 @@ public class Swerve extends SubsystemBase {
         };
 
         //Setup thetaController used for auton and automatic turns
-        thetaController = new ProfiledPIDController(Constants.AutoConstants.kPThetaController, 0, 0,
-                            Constants.AutoConstants.kThetaControllerConstraints);
         thetaController.enableContinuousInput(-Math.PI, Math.PI);
 
         setDefaultCommand(new TeleopSwerve(this, true, false));
+        
+    }
+
+    @Override
+    public void periodic(){
+        swerveOdometry.update(getYaw(), getStates());  
+        double xkP = SpectrumPreferences.getInstance().getNumber("Swerve: X kP", Constants.AutoConstants.kPXController)/100;
+        double xkD = SpectrumPreferences.getInstance().getNumber("Swerve: X kD", 0.0)/100;
+        double ykP = SpectrumPreferences.getInstance().getNumber("Swerve: Y kP", Constants.AutoConstants.kPYController)/100;
+        double ykD = SpectrumPreferences.getInstance().getNumber("Swerve: Y kD", 0.0)/100;
+        double thetakP = SpectrumPreferences.getInstance().getNumber("Swerve: Theta kP", Constants.AutoConstants.kPThetaController)/100;
+        double thetakD = SpectrumPreferences.getInstance().getNumber("Swerve: Theta kD", 0.0)/100;
+        xController.setPID(xkP, 0, xkD);
+        yController.setPID(ykP, 0, ykD);
+        thetaController.setPID(thetakP, 0, thetakD);
     }
 
     public void drive(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
@@ -85,10 +103,12 @@ public class Swerve extends SubsystemBase {
         drive_rotation = rotation;
     }
 
+    //Used for -1 to 1 pid outputs
     public void useOutput(double output) {
         pidTurn = output * Constants.Swerve.maxAngularVelocity;
     }
 
+    //Used for control loops that give a rotational velocity directly
     public void setRotationalVelocity(double rotationalVelocity){
         pidTurn = rotationalVelocity;
     }
@@ -154,11 +174,6 @@ public class Swerve extends SubsystemBase {
 
     }
     
-    @Override
-    public void periodic(){
-        swerveOdometry.update(getYaw(), getStates());  
-    }
-
     public static void printDebug(String msg){
         Debugger.println(msg, Robot._drive, Debugger.debug2);
       }

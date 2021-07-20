@@ -101,8 +101,7 @@ public class SpectrumPreferences {
 	   * @return either the value in the table, or the backup
 	   */
 	  public double getNumber(String key, double backup) {
-		  addNumber(key, backup);
-	    return prefs.getDouble(key, backup);
+	    return addNumber(key, backup);
 	  }
 	  
 	  /**

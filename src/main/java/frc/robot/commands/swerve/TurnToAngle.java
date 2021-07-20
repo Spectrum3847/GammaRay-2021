@@ -8,61 +8,51 @@
 package frc.robot.commands.swerve;
 
 import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
-import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
-import edu.wpi.first.wpilibj2.command.ProfiledPIDCommand;
+import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpiutil.math.MathUtil;
 import frc.robot.RobotContainer;
+import frc.robot.subsystems.Swerve;
 
-public class TurnToAngle extends ProfiledPIDCommand {
+public class TurnToAngle extends CommandBase {
 
   public static double kP = 0.005;
   public static double kI = 0; // 0.00015
   public static double kD = 0.00025; // 0.0005
-
+  ProfiledPIDController controller = null;
+  Swerve swerve = null;
   boolean hasTarget = false;
 
-  public TurnToAngle(double angle) {
-    super(
-        // The ProfiledPIDController used by the command
-        new ProfiledPIDController(
-            // The PID gainss
-            kP, kI, kD,
-            // The motion profile constraints
-            new TrapezoidProfile.Constraints(360, 360)),
-        // This should return the measurement
-        RobotContainer.swerve::getDegrees,
-        // This should return the goal (can also be a constant)
-        angle,
-        // This uses the output
-        (output, setpoint) -> RobotContainer.swerve.useOutput(output));
-    // Use addRequirements() here to declare subsystem dependencies.
-    // Configure additional PID options by calling `getController` here.
-    getController().setTolerance(0.2);
-    double differance = angle - RobotContainer.swerve.getDegrees();
-    if (differance > 180) {
-      differance = (360 - differance) * -1;
-    }
-    getController().setGoal(differance);
+  /*Goal between -pi and pi radians
+  * Positive is CCW
+  */
+  public TurnToAngle(double goalRadians) {
+    swerve = RobotContainer.swerve;
+    controller = swerve.thetaController;
+    goalRadians = MathUtil.angleModulus(goalRadians); //Make sure our goal is -pi to pi
+    controller.setGoal(goalRadians);
+    controller.setTolerance(Math.PI/90); //Tolearance of 2 degrees
   }
 
   @Override
   public void initialize() {
-    super.initialize();
+
   }
 
   @Override
   public void execute() {
-    super.execute();
+    //calculate the deserged rotational velocity of the robot
+    //calculate does input modulus for us
+    swerve.setRotationalVelocity(controller.calculate(swerve.getRadians()));
   }
 
   @Override
   public void end(boolean interrupted) {
-    super.end(interrupted);
-    RobotContainer.swerve.useOutput(0);
+    RobotContainer.swerve.setRotationalVelocity(0);
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return controller.atGoal();
   }
 }
