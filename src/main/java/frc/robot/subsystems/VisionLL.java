@@ -90,8 +90,12 @@ public class VisionLL extends SubsystemBase {
     }
   }
 
-  public double getLLDegToTarget(){
+public double getLLDegToTarget(){
     return limelight.getdegRotationToTarget()  * -1;
+}
+
+public double getLLRadToTarget(){
+  return Math.toRadians(getLLDegToTarget());
 }
 
 public boolean getLLIsTargetFound(){

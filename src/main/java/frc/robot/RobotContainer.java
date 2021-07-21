@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
+import edu.wpi.first.wpiutil.net.PortForwarder;
 import frc.lib.controllers.SpectrumTwoButton;
 import frc.lib.controllers.SpectrumXboxController;
 import frc.lib.drivers.EForwardableConnections;
@@ -21,7 +22,6 @@ import frc.robot.commands.FeedBalls;
 import frc.robot.commands.IntakeBalls;
 import frc.robot.commands.swerve.ResetGyro;
 import frc.robot.commands.auto.TestPathFollowing;
-import frc.robot.commands.auto.ThreeBall;
 import frc.robot.commands.swerve.ClimberSwerve;
 import frc.robot.commands.swerve.LLAim;
 import frc.robot.commands.swerve.TurnToAngle;
@@ -84,12 +84,12 @@ public static Object shooter;
     new SpectrumTwoButton(driverController.leftBumper, driverController.yButton).whileHeld(new ResetGyro(0));
     new SpectrumTwoButton(driverController.leftBumper, driverController.xButton).whileHeld(new ResetGyro(90));
     new SpectrumTwoButton(driverController.leftBumper, driverController.aButton).whileHeld(new ResetGyro(180));
-    new SpectrumTwoButton(driverController.leftBumper, driverController.bButton).whileHeld(new ResetGyro(270));
+    new SpectrumTwoButton(driverController.leftBumper, driverController.bButton).whileHeld(new ResetGyro(-90));
 
     //turn the robot to a cardinal direction
     driverController.yButton.whileHeld(new TurnToAngle(0));
     driverController.xButton.whileHeld(new TurnToAngle(Math.PI/2));
-    driverController.aButton.whileHeld(new TurnToAngle(-Math.PI));
+    driverController.aButton.whileHeld(new TurnToAngle(Math.PI));
     driverController.bButton.whileHeld(new TurnToAngle(-Math.PI/2));
 
     //Climber mode to disable field relative
@@ -144,8 +144,10 @@ public static Object shooter;
 
   //foward limelight ports
   private void portForwarding() {
-    EForwardableConnections.addPortForwarding(EForwardableConnections.LIMELIGHT_CAMERA_FEED);
-    EForwardableConnections.addPortForwarding(EForwardableConnections.LIMELIGHT_WEB_VIEW);
+    //EForwardableConnections.addPortForwarding(EForwardableConnections.LIMELIGHT_CAMERA_FEED);
+    //EForwardableConnections.addPortForwarding(EForwardableConnections.LIMELIGHT_WEB_VIEW);
+    PortForwarder.add(5800, "10.85.15.22", 5800);
+    PortForwarder.add(5801, "10.85.15.22", 5801);
   }
 
   /**

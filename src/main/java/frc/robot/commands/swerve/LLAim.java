@@ -48,11 +48,7 @@ public class LLAim extends PIDCommand {
     this.getController().setPID(kP, kI, kD);
     getController().setTolerance(tolerance);
 
-    if(RobotContainer.visionLL.getLimelightHasValidTarget()) {
-      hasTarget = true;
-    } else {
-      hasTarget = false;
-    }
+    hasTarget = RobotContainer.visionLL.getLimelightHasValidTarget();
 
     /*if(RobotContainer.visionLL.getLLTargetArea() < 0.5) {
       RobotContainer.visionLL.setLimeLightPipeline(1);
