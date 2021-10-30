@@ -14,10 +14,6 @@ import frc.robot.RobotContainer;
 import frc.robot.subsystems.Swerve;
 
 public class TurnToAngle extends CommandBase {
-
-  //public static double kP = 0.005;
-  //public static double kI = 0; // 0.00015
-  //public static double kD = 0.00025; // 0.0005
   ProfiledPIDController controller = null;
   Swerve swerve = null;
   boolean hasTarget = false;
@@ -27,26 +23,23 @@ public class TurnToAngle extends CommandBase {
   * Positive is CCW
   */
   public TurnToAngle(double goalRadians) {
-    goal = goalRadians;
+    goal = MathUtil.angleModulus(goalRadians); //Make sure our goal is -pi to pi
     swerve = RobotContainer.swerve;
     controller = swerve.thetaController;
-    goalRadians = MathUtil.angleModulus(goalRadians); //Make sure our goal is -pi to pi
-    controller.reset(swerve.getRadians());
-    controller.setGoal(goal);
-    controller.setTolerance(0.1); //Tolearance of 2 degrees
-    swerve.setRotationalVelocity(controller.calculate(swerve.getRadians()));
+    controller.setTolerance(Math.PI/180); //Tolearance of 1 degrees
   }
 
   @Override
   public void initialize() {
-
+    controller.reset(swerve.getRadians());
+    controller.setGoal(goal);
+    swerve.setRotationalVelocity(controller.calculate(swerve.getRadians()));
   }
 
   @Override
   public void execute() {
     //calculate the deserged rotational velocity of the robot
     //calculate does input modulus for us
-    controller.setGoal(goal);
     swerve.setRotationalVelocity(controller.calculate(swerve.getRadians()));
   }
 
