@@ -40,3 +40,7 @@ hs_err_pid*
 *.bin
 build/classes/java/main/frc/robot/subsystems/Swerve.class
 build/libs/GammaRay-2021.jar
+*.bin
+*.lock
+*.class
+*.jar
